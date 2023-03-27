@@ -797,8 +797,8 @@ class InboxView(generics.ListCreateAPIView, generics.DestroyAPIView):
         # start hacky stuff
         post_link = request.data.get('object', '')
         if post_link and 'sd7' in post_link:
-                r = requests.get(post_link, auth=(os.getenv('T7_UNAME'), os.getenv('T7_PW')))
-                object_data = r.json()
+            r = requests.get(post_link, auth=(os.getenv('T7_UNAME'), os.getenv('T7_PW')))
+            object_data = r.json()
         else:
             object_data = request.data
         # object_data = request.data
