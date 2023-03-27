@@ -800,7 +800,7 @@ class InboxView(generics.ListCreateAPIView, generics.DestroyAPIView):
                 r = requests.get(post_link, auth=(os.getenv('T7_UNAME'), os.getenv('T7_PW')))
                 object_data = r.json()
         else:
-                object_data = request.data
+            object_data = request.data
         # object_data = request.data
         # end hacky stuff
         
