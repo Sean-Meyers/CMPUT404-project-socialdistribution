@@ -45,6 +45,32 @@ class PostEndpointTest(TestCase):
         Helper method for generating JSON data for a comment. Not implemented.
         """
         # TODO
+        '''These tests verify that the Post endpoint returns the expected JSON data,
+and that the creation and updating of posts works as expected.
+"""
+
+LOCAL_NODE_ADDR = 'http://127.0.0.1:8000/'
+
+@classmethod
+def helper_generate_comment_json(cls, author, content):
+    """
+    Helper method for generating JSON data for a comment.
+    """
+    comment_json = {
+        "author": {
+            "id": author.id,
+            "name": author.name,
+            "url": author.url,
+            "host": author.host,
+            "displayName": author.displayName,
+            "github": author.github,
+        },
+        "content": content,
+        "published": datetime.datetime.now().isoformat(),
+        "id": str(uuid.uuid4()),
+        "parent": str(uuid.uuid4()),
+    }
+    return comment_json'''
         pass
     
     
