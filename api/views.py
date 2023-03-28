@@ -822,7 +822,7 @@ class InboxView(generics.ListCreateAPIView, generics.DestroyAPIView):
         
         elif request.data.get('type', '').lower() == 'comment':
             data_comment = request.data
-            
+
             author_id = kwargs['author_id']
             comment_id:str =data_comment.get('id')
             post_id = comment_id.split('/')[-3]
@@ -831,10 +831,10 @@ class InboxView(generics.ListCreateAPIView, generics.DestroyAPIView):
             data_comment['post_id'] = post_id
             
             try:
-
                 CommentsView.create_comment(data_comment)
             except Exception as e:
                 print(e)
+
                 return Response(str(e), status=400)
 
         author_data = request.data.get('author', None)
