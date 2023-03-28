@@ -574,6 +574,19 @@ class CommentsView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=400)
     
 
+    @staticmethod
+    def create_comment(comment_data):
+        post = comment_data.get('post_id')
+        post = PostsModel.objects.filter(id=post).first()
+        comment_data['post'] = PostsSerializer(post).data
+        serializer = CommentsSerializer(data=comment_data)
+        if serializer.is_valid():
+            serializer.save()
+            return serializer.data
+        else:
+            return serializer.errors
+    
+
 class LikeView(generics.ListCreateAPIView):
     """
     Class for handling the likes of a given post, can be used to get all likes of a given post
@@ -785,6 +798,16 @@ class InboxView(generics.ListCreateAPIView, generics.DestroyAPIView):
                 })
             except Exception as e:
                 return Response(str(e), status=400)
+        
+        elif request.data.get('type', '').lower() == 'comment':
+            data_comment = request.data
+            post_id = kwargs['post_id']
+            author_id = kwargs['author_id']
+            post_id = build_post_url(author_id, post_id)
+            try:
+                CommentsView.create_comment(data_comment)
+            except Exception as e:
+                return Response(str(e), status=400)
 
         author_data = request.data.get('author', None)
 
@@ -797,7 +820,7 @@ class InboxView(generics.ListCreateAPIView, generics.DestroyAPIView):
         # start hacky stuff
         post_link = request.data.get('object', '')
         if post_link and 'sd7' in post_link:
-            r = requests.get(post_link, auth=(os.getenv('T7_UNAME'), os.getenv('T7_PW')))
+            r = requests.get(post_link, auth=(os.getenv('T7_UNAME'), os.getenv('T7_PW')), timeout=5)
             object_data = r.json()
         else:
             object_data = request.data
