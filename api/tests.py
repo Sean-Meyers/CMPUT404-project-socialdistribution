@@ -16,6 +16,18 @@ import datetime
 import uuid
 import random
 
+from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIRequestFactory, force_authenticate
+from django.contrib.auth.models import User
+import json
+
+from . import models
+import datetime
+import uuid
+import random
+
 # FIXME: tHE THING RUNS EACH TEST INDEPENDANT FROM EACH OTHER BUT THAT'S NOT HOW i WROTE THEM.
 
 # Create your tests here.
@@ -393,3 +405,54 @@ class PostEndpointTest(TestCase):
         response = self.client.delete(post_links[0])
         
         self.assertEqual(response.status_code, 404, "Status code is not 404")
+
+
+class AuthorEndpointTest(TestCase):
+    LOCAL_NODE_ADDR = "http://127.0.0.1:8000/"
+
+    SAMPLE_AUTHORS = []
+    SAMPLE_AUTHOR_NAMES = ["John", "Jane", "Bob", "Alice", "Joe", "Mary", "Tom", "Sally", "Jack", "Jill"]
+    SAMPLE_PROFILE_IMAGE_URLs = ["https://www.google.com", "https://www.facebook.com", "https://www.twitter.com"]
+
+    # ... (Other class methods here)
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.sample_authors = self.pushAuthorsToDatabase()
+
+    def test_get_all_authors(self):
+        request = self.factory.get('/services/authors')
+        force_authenticate(request, user=self.user)
+        response = views.AuthorEndpoint.as_view()(request)
+
+        expected = {
+            "type": "authors",
+            "items": self.SAMPLE_AUTHORS
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(response.content, expected)
+
+    def test_get_author_by_id(self):
+        author = self.SAMPLE_AUTHORS[0]
+        author_id = author['id'].split('/')[-1]
+
+        request = self.factory.get(f'/services/authors/{author_id}')
+        force_authenticate(request, user=self.user)
+        response = views.AuthorEndpoint.as_view()(request, author_id=author_id)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(response.content, author)
+
+    def test_put_new_author(self):
+        author = self.createAuthor()
+        authorJson = self.createAuthorJson(author)
+
+        request = self.factory.put(f'/services/authors/{author["id"]}', data=authorJson, content_type="application/json")
+        force_authenticate(request, user=self.user)
+        response = views.AuthorEndpoint.as_view()(request, author_id=author["id"])
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(response.content, {"success": True})
+
