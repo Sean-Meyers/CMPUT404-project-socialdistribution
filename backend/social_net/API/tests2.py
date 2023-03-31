@@ -660,3 +660,56 @@ class AuthorFollowersOperationsViewTest(TestCase):
         '''
         This test case for comment
         '''
+'''
+class AuthorFollowersViewTest(APITestCase):
+    def setUp(self):
+        self.author1 = User.objects.create(
+            id='1',
+            displayName='John Doe',
+            url='https://example.com/johndoe',
+            host='https://example.com',
+            github='https://github.com/johndoe'
+        )
+        self.author2 = User.objects.create(
+            id='2',
+            displayName='Jane Smith',
+            url='https://example.com/janesmith',
+            host='https://example.com',
+            github='https://github.com/janesmith'
+        )
+        self.author1.followers = ['2', '3']
+        self.author1.save()
+        self.uid = '1'
+        self.foreign_uid = '2'
+        self.url = reverse('author-followers-ops', kwargs={'uid': self.uid, 'foreign_uid': self.foreign_uid})
+
+    def test_get_author_follower_status(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'status': 'friends'})
+
+    def test_add_author_follower(self):
+        response = self.client.put(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['followers'], ['2', '3', '2'])
+
+    def test_remove_author_follower(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['followers'], ['3'])
+
+    def test_post_comment(self):
+        data = {
+            'type': 'comment',
+            'author': str(self.author1.id),
+            'post': str(self.post.id),
+            'content': 'New test comment'
+        }
+        response = self.client.post(f'/comments/{self.author1.id}/{self.post.id}/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['type'], 'comments')
+        self.assertEqual(response.data['post'], str(self.post.id))
+        self.assertTrue('comments' in response.data)
+        self.assertEqual(len(response.data['comments']), 2)
+        self.assertEqual(response.data['comments'][0]['content'], 'New test comment')
+'''
