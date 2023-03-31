@@ -16,7 +16,7 @@ from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 
 # Use the User class here
-from django.urls import reverse
+
 
 from rest_framework.test import APITestCase
 
