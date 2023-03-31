@@ -116,20 +116,24 @@ class PostsSerializer(serializers.ModelSerializer):
 
         return repr
     
-    # def to_internal_value(self, data):
-    #     # For when we're creating brand new posts
-    #     if self.context['set_origin']:
-    #         data['origin'] = data['id']
-    #     if self.context['set_source']:      # Note: can use a similar idea for when (if) resharing is implemented
-    #         data['source'] = data['id']
+    def to_internal_value(self, data):
+        # For when we're creating brand new posts
+        for key, value in data.items():
+                if "localhost" in value:
+                    if self.context['set_origin']:
+                        data['origin'] = data[key]
+                    if self.context['set_source']:      # Note: can use a similar idea for when (if) resharing is implemented
+                        data['source'] = data[key]
         
-    #      # Don't want no localhost in my urls
-    #     if 'localhost' in data['source']:
-    #         data['source'] = data['id']
-    #     if 'localhost' in data['origin']:
-    #         data['origin'] = data['id']        
+        for key, value in data.items():
+                if "localhost" not in value:
+         # Don't want no localhost in my urls
+                    if 'localhost' in data['source']:
+                        data['source'] = data[key]
+                    if 'localhost' in data['origin']:
+                        data['origin'] = data[key]        
         
-    #     return super().to_internal_value(data)
+        return super().to_internal_value(data)
 
 
 
