@@ -456,3 +456,60 @@ class AuthorEndpointTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(response.content, {"success": True})
 
+from django.urls import reverse
+from rest_framework.test import APIRequestFactory, force_authenticate, TestCase
+from rest_framework import status
+import json
+import uuid
+import random
+from . import models
+
+# ...
+
+class PostEndpointTest(TestCase):
+    # ...
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.author = models.AuthorModel.objects.create(
+            type=self.SAMPLE_AUTHOR["type"],
+            id=self.SAMPLE_AUTHOR["id"],
+            host=self.SAMPLE_AUTHOR["host"],
+            displayName=self.SAMPLE_AUTHOR["displayName"],
+            url=self.SAMPLE_AUTHOR["url"],
+            github=self.SAMPLE_AUTHOR["github"],
+            profileImage=self.SAMPLE_AUTHOR["profileImage"],
+        )
+
+    def test_get_all_posts(self):
+        request = self.factory.get(reverse("PostsView", kwargs={"author_id": self.SAMPLE_AUTHOR_ID}))
+        force_authenticate(request, user=self.author)
+        response = views.PostsView.as_view()(request, author_id=self.SAMPLE_AUTHOR_ID)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(response.content, {"posts": self.SAMPLE_POSTS})
+
+    def test_get_post_by_id(self):
+        self.pushPostsToDatabase()
+        request = self.factory.get(reverse("PostsRetriveView", kwargs={"author_id": self.SAMPLE_AUTHOR_ID, "post_id": self.SAMPLE_POSTS[0]["id"].split("/")[-1]}))
+        force_authenticate(request, user=self.author)
+        response = views.PostsRetriveView.as_view()(request, author_id=self.SAMPLE_AUTHOR_ID, post_id=self.SAMPLE_POSTS[0]["id"].split("/")[-1])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        res = json.loads(response.content)
+        del res["published"]
+        exp = self.SAMPLE_POSTS[0].copy()
+        exp["author"] = self.SAMPLE_AUTHOR
+        exp["count"] = 0
+        exp["comments"] = ""
+        exp["commentsSrc"] = []
+
+        self.assertJSONEqual(json.dumps(res), exp)
+
+    def test_get_comments_for_post(self):
+        self.pushPostsToDatabase()
+        request = self.factory.get(reverse("CommentsView", kwargs={"author_id": self.SAMPLE_AUTHOR_ID, "post_id": self.SAMPLE_POSTS[0]["id"].split("/")[-1]}))
+        force_authenticate(request, user=self.author)
+        response = views.CommentsView.as_view()(request, author_id=self.SAMPLE_AUTHOR_ID, post_id=self.SAMPLE_POSTS[0]["id"].split("/")[-1])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(response.content, {"type": "comments", "page": 1, "size": 5, "post": self.SAMPLE_POSTS[0]["id"], "id": self.SAMPLE_POSTS[0]["id"], "comments": []})
+
