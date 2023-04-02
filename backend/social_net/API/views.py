@@ -74,7 +74,7 @@ def AuthorView(request, uid):
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 def AuthorsView(request):
     """
-    API endpoint for getting all authors on the server 
+    API endpoint for getting all authors on the server 2.0.
     
     URL: ://service/authors/
         GET [local, remote]: retrieve all profiles on the server (paginated)
