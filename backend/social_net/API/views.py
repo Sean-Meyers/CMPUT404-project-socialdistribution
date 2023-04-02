@@ -79,29 +79,7 @@ def AuthorView(request, uid):
         openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
         openapi.Parameter('size', openapi.IN_QUERY, description="Page size", type=openapi.TYPE_INTEGER)
     ],
-    responses={{
-    "type": "authors",      
-    "items":[
-        {
-            "type":"author",
-            "id":"http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471",
-            "url":"http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471",
-            "host":"http://127.0.0.1:5454/",
-            "displayName":"Greg Johnson",
-            "github": "http://github.com/gjohnson",
-            "profileImage": "https://i.imgur.com/k7XVwpB.jpeg"
-        },
-        {
-            "type":"author",
-            "id":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
-            "host":"http://127.0.0.1:5454/",
-            "displayName":"Lara Croft",
-            "url":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
-            "github": "http://github.com/laracroft",
-            "profileImage": "https://i.imgur.com/k7XVwpB.jpeg"
-        }
-    ]
-}
+    responses={
         200: openapi.Response('Successful response', schema=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
@@ -151,7 +129,23 @@ def AuthorsView(request):
 
         return JsonResponse({"success":True,}, status = 200)
    
-
+@swagger_auto_schema(
+    methods=['get'],
+    operation_summary="Get a list of an author's followers",
+    operation_description="Get a list of authors who are AUTHOR_ID's followers",
+    responses={
+        200: openapi.Response('Successful response', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'uid': openapi.Schema(type=openapi.TYPE_STRING),
+                'followers': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example='http://127.0.0.1:8000/author/398bde52-d235-4712-b0c8-3f3f3f3f3f3f'
+                ))
+            }
+        ))
+    }
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 def AuthorFollowersView(request, uid):
