@@ -5,6 +5,16 @@ import uuid
 from .utils import create_author_url, build_url, create_post_url, create_comment_url
 from django.contrib.auth.models import User
 
+"""
+NodeModel: Represents a node in a distributed social media network. It contains fields for node URL, name, and a corresponding Django user.
+AuthorModel: Represents an author in the application. It contains fields for unique ID, author type, host, display name, GitHub URL, profile image, and creation timestamp.
+PostsModel: Represents a post made by an author. It includes fields for title, source, origin, description, content type, content, categories, visibility, and publication timestamp. It also contains foreign key references to the author who created the post.
+ImageModel: Represents an image associated with either a post or an author. It contains fields for image URL and foreign key references to the associated post or author.
+CommentsModel: Represents a comment on a post. It contains fields for comment type, content, content type, and foreign key references to the author who wrote the comment and the post it is associated with.
+LikeModel: Represents a "like" for a post or comment. It contains fields for summary, like type, and foreign key references to the author who liked the content, as well as the associated post or comment.
+FollowModel: Represents a follow relationship between two authors. It contains fields for follow type, status (pending, friends, or not friends), following, and follower.
+InboxModel: Represents an author's inbox for incoming content. It contains fields for inbox type (post, comment, follow, or like), foreign key reference to the author, and the JSON object containing the incoming content.
+"""
 
 class NodeModel(models.Model):
     node_url = models.URLField()
