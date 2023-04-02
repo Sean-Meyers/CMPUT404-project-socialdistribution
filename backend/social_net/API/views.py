@@ -7,7 +7,8 @@ from .serializers import PostsSerializer, AuthorSerializer, CommentsSerializer, 
 import json
 import uuid
 
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 class PermittedForRemote(BasePermission):
     """
     Custom permission class that determines permissions based on the endpoint
@@ -70,6 +71,53 @@ def AuthorView(request, uid):
 
 
 # FIXME: According to the spec, this should only support GET, and not POST: https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#authors
+@swagger_auto_schema(
+    methods=['get'],
+    operation_summary="Get all authors",
+    operation_description="Retrieve all authors on the server (paginated)",
+    manual_parameters=[
+        openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
+        openapi.Parameter('size', openapi.IN_QUERY, description="Page size", type=openapi.TYPE_INTEGER)
+    ],
+    responses={{
+    "type": "authors",      
+    "items":[
+        {
+            "type":"author",
+            "id":"http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471",
+            "url":"http://127.0.0.1:5454/authors/1d698d25ff008f7538453c120f581471",
+            "host":"http://127.0.0.1:5454/",
+            "displayName":"Greg Johnson",
+            "github": "http://github.com/gjohnson",
+            "profileImage": "https://i.imgur.com/k7XVwpB.jpeg"
+        },
+        {
+            "type":"author",
+            "id":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
+            "host":"http://127.0.0.1:5454/",
+            "displayName":"Lara Croft",
+            "url":"http://127.0.0.1:5454/authors/9de17f29c12e8f97bcbbd34cc908f1baba40658e",
+            "github": "http://github.com/laracroft",
+            "profileImage": "https://i.imgur.com/k7XVwpB.jpeg"
+        }
+    ]
+}
+        200: openapi.Response('Successful response', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'type': openapi.Schema(type=openapi.TYPE_STRING),
+                'items': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'displayName': openapi.Schema(type=openapi.TYPE_STRING),
+                        'url': openapi.Schema(type=openapi.TYPE_STRING)
+                    }
+                ))
+            }
+        ))
+    }
+)
 @api_view(['GET', 'POST'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 def AuthorsView(request):
