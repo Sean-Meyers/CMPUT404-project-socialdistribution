@@ -436,7 +436,51 @@ def CommentsView(request, author_id, post_id):
         return JsonResponse(output, status = 200)
 
 
-
+@swagger_auto_schema(
+    methods=['post'],
+    operation_summary="Send new content for authors across nodes",
+    operation_description="Send a post to the author",
+    manual_parameters=[
+        openapi.Parameter('author_id', openapi.IN_PATH, description="Author ID", type=openapi.TYPE_STRING),
+    ],
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'object': openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'type': openapi.Schema(type=openapi.TYPE_STRING, enum=['post', 'follow', 'like', 'comment']),
+                    'id': openapi.Schema(type=openapi.TYPE_STRING, example='http://127.0.0.1:8000/posts/5c034875-69de-4f8f-b074-6c03cbdb0e1d'),
+                    'author': openapi.Schema(type=openapi.TYPE_OBJECT, properties={
+                        'type': openapi.Schema(type=openapi.TYPE_STRING, example='author'),
+                        'id': openapi.Schema(type=openapi.TYPE_STRING, example='http://127.0.0.1:8000/author/398bde52-d235-4712-b0c8-3f3f3f3f3f3f'),
+                        'host': openapi.Schema(type=openapi.TYPE_STRING, example='http://127.0.0.1:8000/'),
+                        'displayName': openapi.Schema(type=openapi.TYPE_STRING, example='John Doe'),
+                        'url': openapi.Schema(type=openapi.TYPE_STRING, example='http://127.0.0.1:8000/author/398bde52-d235-4712-b0c8-3f3f3f3f3f3f'),
+                        'github': openapi.Schema(type=openapi.TYPE_STRING, example='http://github.com/johndoe'),
+                        'bio': openapi.Schema(type=openapi.TYPE_STRING, example='I am a software engineer'),
+                        'followers': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            example='http://127.0.0.1:8000/author/398bde52-d235-4712-b0c8-3f3f3f3f3f3f'
+                        ))
+                    }),
+                    'object': openapi.Schema(type=openapi.TYPE_STRING, example='Hello, world!')
+                },
+                required=['type', 'id', 'author', 'object']
+            )
+        }
+    ),
+    responses={
+        200: openapi.Response('Successful response', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'status': openapi.Schema(type=openapi.TYPE_STRING, example='success')
+            }
+        )),
+        404: "Author not found",
+        500: "Internal server error"
+    }
+)
 @api_view(['POST'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 def InboxView(request, author_id):
