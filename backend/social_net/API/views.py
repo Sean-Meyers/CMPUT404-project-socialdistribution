@@ -276,25 +276,7 @@ def FollowView(request, author_uid, foreign_uid):
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
-@swagger_auto_schema(
-    method='get',
-    operation_description='API endpoint that allows users to search for other users.',
-    responses={
-        200: openapi.Response(
-            'Successful operation',
-            schema=openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'type': openapi.Schema(type=openapi.TYPE_STRING, description='Type of result, "authors" in this case'),
-                    'items': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT), description='List of authors matching the search query'),
-                },
-            ),
-        ),
-    },
-    manual_parameters=[
-        openapi.Parameter('query', openapi.IN_QUERY, description='Search query to filter authors by display name', type=openapi.TYPE_STRING, required=True),
-    ],
-)
+
 def SearchView(request):
     """
     API endpoint that allows users to search for other users.
