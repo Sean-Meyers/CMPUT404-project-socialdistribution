@@ -4,6 +4,8 @@ This is a school project at the University of Alberta, for CMPUT 404.
 Website: https://cmput-404-project-socialdistribution.vercel.app/auth
 
 API base url: http://sd16-api.herokuapp.com/
+API Documentation: http://sd16-api.herokuapp.com/swagger
+
 
 ## Set up (`cd ./backend`):
 - `sudo apt install pipenv`
