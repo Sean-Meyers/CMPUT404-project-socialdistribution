@@ -1,5 +1,5 @@
 ## CMPUT 404 Social Distribution
-This is school project at the University of Alberta, for CMPUT 404.
+This is a school project at the University of Alberta, for CMPUT 404.
 
 Website: https://cmput-404-project-socialdistribution.vercel.app/auth
 
