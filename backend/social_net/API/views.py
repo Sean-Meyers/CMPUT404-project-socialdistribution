@@ -273,7 +273,25 @@ def FollowView(request, author_uid, foreign_uid):
         foreign_object.save()
         return JsonResponse({"status": "success"}, status = 200)
 
-
+@swagger_auto_schema(
+    method='get',
+    operation_description='API endpoint that allows users to search for other users.',
+    responses={
+        200: openapi.Response(
+            'Successful operation',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'type': openapi.Schema(type=openapi.TYPE_STRING, description='Type of result, "authors" in this case'),
+                    'items': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT), description='List of authors matching the search query'),
+                },
+            ),
+        ),
+    },
+    manual_parameters=[
+        openapi.Parameter('query', openapi.IN_QUERY, description='Search query to filter authors by display name', type=openapi.TYPE_STRING, required=True),
+    ],
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 
@@ -577,26 +595,7 @@ def InboxView(request, author_id):
     LikeModel.objects.create(**output)
     return JsonResponse({"status":"success"}, status = 200)
 
-@swagger_auto_schema(
-    method='get',
-    operation_description='API endpoint that allows users to like a post.',
-    responses={
-        200: openapi.Response(
-            'Successful operation',
-            schema=openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'object': openapi.Schema(type=openapi.TYPE_STRING, description='Post URL'),
-                    'likes': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT), description='List of post likes'),
-                },
-            ),
-        ),
-    },
-    manual_parameters=[
-        openapi.Parameter('author_id', openapi.IN_PATH, description='Author ID', type=openapi.TYPE_STRING),
-        openapi.Parameter('post_id', openapi.IN_PATH, description='Post ID', type=openapi.TYPE_STRING),
-    ],
-)
+
 @api_view(['GET'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 
@@ -622,7 +621,7 @@ def PostLikeView(request, author_id, post_id):
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'object': openapi.Schema(type=openapi.TYPE_STRING, description='Post URL'),
+                    'object': openapi.Schema(type=openapi.TYPE_STRING, description='Post URL with trailing slash'),
                     'likes': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT), description='List of liked posts'),
                 },
             ),
