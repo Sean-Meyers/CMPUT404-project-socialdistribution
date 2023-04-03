@@ -349,6 +349,18 @@ def PostsView(request, author_id):
 
 @api_view(['GET', 'POST', 'DELETE', 'PUT'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
+@swagger_auto_schema(
+    operation_summary="API endpoint for CRUD operations on a post with specified id.",
+    operation_description="Be aware that Posts can be images that need base64 decoding. Posts can also hyperlink to images that are public.",
+    responses={
+        200: openapi.Response('Success'),
+        401: openapi.Response('Unauthorized'),
+        403: openapi.Response('Forbidden'),
+        404: openapi.Response('Not Found'),
+        405: openapi.Response('Method Not Allowed'),
+        500: openapi.Response('Internal Server Error')
+    }
+)
 def PostsRetrieveView(request, author_id, post_id):
     """
     API endpoint for CRUD operations on a post with specified id.
