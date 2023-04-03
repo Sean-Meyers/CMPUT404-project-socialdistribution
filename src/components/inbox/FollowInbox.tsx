@@ -54,7 +54,7 @@ const FollowInbox: React.FC<CommentInboxProps> = ({follow}) => {
                      {follow?.actor?.displayName}
                 </Link>
             </div>
-            {<div className='space-x-3 mt-2'>
+            {follow.summary?.includes('want') && <div className='space-x-3 mt-2'>
             <button className='border text-gray-500 hover:bg-gray-50 border-gray-300 shadow-sm rounded-md px-3 py-1 text-sm' onClick={() => approveFollowMutation.mutate()}>Approve</button>
             <button className='text-red-500 border-red-500 border hover:bg-gray-50 bg-white rounded-md px-3 py-1 text-sm' onClick={() => rejectFollowMutation.mutate()}>Reject</button>
             </div>}

@@ -119,8 +119,8 @@ class API {
                     });
             }
         } catch (e) {
-            console.error(`Error adding follower at "${FOLLOWER_ENDPOINT}"`);
-            console.error(e);
+            throw e;
+           
         }   
     }
 
@@ -135,18 +135,18 @@ class API {
     }
 
     public async removeFollower(authorId: string, foreignAuthorId: string): Promise<void> {
-        try {
-            return await this.axiosInstance.delete<void, any>(`/authors/${authorId}/followers/${foreignAuthorId}`);
-        } 
-        catch (e) {
-            console.error(e);
-        } 
+        if (authorId === foreignAuthorId && authorId === '') {
+            throw new Error('Cannot remove yourself as a follower');
+        }
+        return await this.axiosInstance.delete<void, any>(`/authors/${authorId}/followers/${foreignAuthorId}`, {
+            timeout:5000
+        });
+        
     }
 
     public async sendFollowRequest(authorTo:Author, authorFrom:Author):Promise<void> {
-        try {
-            if (authorTo.id) {
-            let authorId = authorTo.id.split('/').pop();
+        
+            let authorId = authorTo?.id?.split('/').pop();
             await this.axiosInstance.post(`/authors/${authorId}/follow-request`, {
                     type: 'follow',
                     summary: `${authorFrom?.displayName || 'Someone'} wants to follow you`,
@@ -154,12 +154,8 @@ class API {
                     object: authorTo
             })
         }
-        } catch (e) {
-            console.error(e);
-        }
-        
-    }
 
+        
     public async getPost(authorId:string, postId:string):Promise<Post | null> {
         try {
             const result = await this.axiosInstance.get<Post>(`/authors/${authorId}/posts/${postId}`);
@@ -223,6 +219,16 @@ class API {
         await this.sendToInbox(authorId,  post)
     }
 
+    public async alertNewPostAuthors(authorId:string, post:Post, authors:string[]) {
+        await Promise.all(authors.map(async author => {
+                author = author.split('/').pop() || '';
+                await this.sendToInbox(author, post);
+            }
+        ));  
+        // Add to author's inbox
+        await this.sendToInbox(authorId,  post)
+    }
+
     public async updatePost(authorId:string, postId: string, post: Post): Promise<Post> {
         const result = await this.axiosInstance.put<Post>(`/authors/${authorId}/posts/${postId}`, post);
         return result.data;
@@ -266,7 +272,7 @@ class API {
             return result.data;
         }
         catch (e) {
-            return null;
+            throw e;
         }
     }
 
@@ -281,7 +287,7 @@ class API {
                 }
             );
         } catch (e) {
-            console.error(e);
+            throw e;
         }     
     }
 
@@ -314,7 +320,9 @@ class API {
     }
 
     public async sendToInbox(authorId:string, activity:Activity):Promise<void> {
-        const result = await this.axiosInstance.post(`/authors/${authorId}/inbox/`, activity);
+        const result = await this.axiosInstance.post(`/authors/${authorId}/inbox/`, activity, {
+            timeout: 4000
+        });
         return result.data;
     }
 

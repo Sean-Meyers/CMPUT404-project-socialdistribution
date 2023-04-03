@@ -16,7 +16,7 @@ export default async function handler(
         }
         catch (e) {
             console.error(e);
-            return res.status(200).json(false);
+            return res.status(500).json(false);
         }
     }
 }

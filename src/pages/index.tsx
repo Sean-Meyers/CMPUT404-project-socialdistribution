@@ -63,7 +63,7 @@ const Stream: React.FC<streamProps> = ({authorId}) => {
 			data.items.length === 0 && (
 				<div className='w-full mx-auto bg-white px-6 max-w-4xl'>
 					<div className='flex flex-col items-center justify-center h-full'>
-						<h1 className='text-3xl font-bold text-gray-700 mb-3'>No Activity Yet</h1>
+						<h1 className='text-3xl font-bold text-gray-700 mb-3'>No Activity Found</h1>
 						<p className='text-gray-500'>
 							Maybe follow some friends so you can have some activity?
 						</p>

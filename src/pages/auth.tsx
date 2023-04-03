@@ -22,8 +22,10 @@ const AuthPage: React.FC<loginProps> = ({}) => {
 
     if (!user)
     return (
-        <div className='container mx-auto mt-12'>
-
+        <div className='container mx-auto mt-12 max-w-3xl px-8'>
+          <div className='text-3xl text-gray-700 font-semibold mb-4 text-center'>
+            Welcome to Your Doom
+          </div>
       <Auth
         redirectTo={process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000/'}
         appearance={{ theme: ThemeSupa }}

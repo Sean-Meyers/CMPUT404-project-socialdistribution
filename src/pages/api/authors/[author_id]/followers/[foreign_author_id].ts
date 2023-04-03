@@ -30,21 +30,22 @@ export default async function handler(
         }
         catch (e) {
             console.error(e);
-            return res.status(200).json(false);
+            return res.status(500).json(false);
         }
     }
 
     if (req.method === 'DELETE') {
             try {
+                 
             let {author_id, foreign_author_id} = req.query;
             const results = await NodeManager.removeFollower(author_id as string, foreign_author_id as string);
-    
+           
             return res.status(200).json(results);
                 
             }
             catch (e) {
                 console.error(e);
-                return res.status(200).json(false);
+                return res.status(500).json(false);
             }
     }
 }

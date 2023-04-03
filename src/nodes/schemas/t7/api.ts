@@ -57,7 +57,7 @@ class API7 extends APIBase {
     public override async getAuthors(page: number = 1, size: number = 10, query?: string): Promise<ListItem<Author>> {
         
         
-        let result = await AuthorsService.authorsList(page, size);
+        let result = await AuthorsService.authorsList(1, size);
 
         return {
             type: "authors",

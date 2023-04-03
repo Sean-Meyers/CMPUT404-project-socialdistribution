@@ -46,6 +46,10 @@ class NodeClient  {
         return await this.APIInstance.alertNewPost(authorId, post);
     }
 
+    public async alertNewPostAuthors(authorId:string, post: Post, authors:string[]): Promise<void> {
+        return await this.APIInstance.alertNewPostAuthors(authorId, post, authors);
+    }
+
 
     public async addFollower(authorId: string, foreignAuthorId: string): Promise<void> {
         await this.APIInstance.addFollower(authorId, foreignAuthorId);
@@ -56,11 +60,16 @@ class NodeClient  {
     }
 
     public async removeFollower(authorId: string, foreignAuthorId: string): Promise<void> {
+        
         await this.APIInstance.removeFollower(authorId, foreignAuthorId);
     }
 
     public async sendFollowRequest(authorTo:Author, authorFrom:Author):Promise<void> {
-        await this.APIInstance.sendFollowRequest(authorTo, authorFrom);
+       try {
+             await this.APIInstance.sendFollowRequest(authorTo, authorFrom);
+       } catch (e) {
+            throw new Error("Error sending follow request");
+       }
     }
 
     public async getPost(authorId:string, postId: string): Promise<Post | null> {

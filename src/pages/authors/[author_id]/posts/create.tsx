@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import dynamic from "next/dynamic";
 import TextArea from "@/components/Textarea";
 import Input from "@/components/Input";
@@ -7,15 +7,18 @@ import Head from 'next/head';
 import File from "@/components/File";
 import Sidebar from '@/components/Sidebar';
 import Select from "@/components/Select";
-import { Auth } from '@supabase/auth-ui-react'
-import {ThemeSupa} from '@supabase/auth-ui-shared'
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useForm, FormProvider } from "react-hook-form";
 import { getBase64 } from '@/utils';
-import {NodeManager, NodeClient}from '@/nodes';
+import { NodeClient, NodeManager } from '@/nodes';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs';
+import { useQuery } from '@tanstack/react-query';
+import AsyncSelect from 'react-select/async';
+import {Options} from 'react-select';
+import { Author } from '@/index';
+import { useAlert } from 'react-alert';
 const MDEditor = dynamic(
 	() => import("@uiw/react-md-editor"),
 	{ ssr: false }
@@ -23,17 +26,41 @@ const MDEditor = dynamic(
 
 interface createProps {
 	authorId: string
+	authors: Author[]
+}
+
+interface Option {
+	readonly label: string;
+	readonly value: string;
 }
 
 
-
-const Create: React.FC<createProps> = ({authorId}) => {
+const Create: React.FC<createProps> = ({authorId, authors}) => {
 	const [selectValue, setSelectValue] = useState<string>("text/plain");
+	const [selectVisibility, setSelectVisibility] = useState<string>('PUBLIC');
 	const [markDownValue, setMarkDownValue] = useState<string | undefined>("")
+	const [privateAuthors, setPrivateAuthors] = useState<Option[]>([])
 	const form  = useForm()
-	const supabaseClient = useSupabaseClient()
-  	const user = useUser()
+	const alert = useAlert()
 	const router = useRouter()
+	
+
+
+	const loadOptions =  (inputValue: string) => {
+		return new Promise<Option[]>((resolve) => {
+			console.log(authors)
+		let filtered = authors.filter(i =>
+					i.displayName?.toLowerCase().includes(inputValue.toLowerCase())
+				).map(i => {
+					return {
+						label: i.displayName || '',
+						value: i.id || ''
+					}
+				}) 
+			resolve(filtered || [])	
+		});
+				
+	}
 
 
 	const onSubmit = async (data:any) => {
@@ -63,12 +90,18 @@ const Create: React.FC<createProps> = ({authorId}) => {
 			let createdPost = await NodeClient.createPost(authorId, post)
 			
 			if (createdPost) {
-				await NodeClient.alertNewPost(authorId, createdPost) 
+				if (data.visibility === 'PUBLIC') {
+				await NodeClient.alertNewPost(authorId, createdPost)
+			} else if (data.visibility === 'PRIVATE') {
+				let authorIds = privateAuthors.map(i => i.value)
+				await NodeClient.alertNewPostAuthors(authorId, createdPost, authorIds);
 			}
+		}
 			
 			await router.push(`/authors/${authorId}`)
+			alert.success('Post created successfully!')
 		} catch (error) {
-			console.log(error)
+			alert.error('There was an error creating your post.')
 		}
 		
 }
@@ -132,6 +165,7 @@ const Create: React.FC<createProps> = ({authorId}) => {
 				register={form.register}
 				id="visibility"
 				name={"Post Visibility"}
+				setValue={setSelectVisibility}
 			options={
 				[{
 					name: "Public",
@@ -145,6 +179,21 @@ const Create: React.FC<createProps> = ({authorId}) => {
 				}]
 			}/>
 			</div>
+			
+			{selectVisibility === 'PRIVATE' && <AsyncSelect
+			value={privateAuthors}
+			onChange={(newValue) => {
+				setPrivateAuthors(newValue as Option[])
+			}}
+				styles={{
+  					input: (base) => ({
+						...base,
+						'input:focus': {
+							boxShadow: 'none',
+						},
+					}),
+				}}
+			cacheOptions loadOptions={loadOptions} isMulti placeholder="Select authors" className='mb-6' /> }
 			<Button name="Create Post" className="text-white"/>
 			
 		</form>
@@ -169,9 +218,12 @@ export const getServerSideProps:GetServerSideProps = async (context) => {
 		}
 	  }
 
+	  let authors = await NodeManager.getAuthors()
+
 	return {
 	  props: {
-		authorId: user.id
+		authorId: user.id,
+		authors: authors.items
 	  }
 	}
   }

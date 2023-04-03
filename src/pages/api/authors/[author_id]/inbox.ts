@@ -14,7 +14,7 @@ export default async function handler(
         }
         catch (e) {
             console.error(e);
-            return res.status(200).json(null);
+            return res.status(500).json(null);
         }
     }
     else if (req.method === 'POST') {
@@ -26,7 +26,7 @@ export default async function handler(
         }
         catch (e) {
             console.error(e);
-            return res.status(200).json(null);
+            return res.status(500).json(null);
         }
     }
 
@@ -38,7 +38,7 @@ export default async function handler(
         }
         catch (e) {
             console.error(e);
-            return res.status(200).json(null);
+            return res.status(500).json(null);
         }
     }
 }

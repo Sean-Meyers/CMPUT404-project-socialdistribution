@@ -11,7 +11,7 @@ class API {
             {
                 baseURL: apiURL,
              
-             
+                
                 ...axiosConfig
             }
         );
@@ -30,7 +30,7 @@ class API {
     public async getAuthors(page:number = 1, size:number = 25, query:string = ''):Promise<ListItem<Author>> {
         
         try {
-            const results = await this.axiosInstance.get<ListItem<Author>>(`/authors/?page=${page}&size=${size}&query=${query}`);
+            const results = await this.axiosInstance.get<ListItem<Author>>(`/authors/`);
             if (results.data.items === undefined) {
                 throw new Error("items is undefined");
             }
@@ -145,17 +145,12 @@ class API {
          if (this.nodeType === "remote") {
             throw new Error("Remote nodes do not support this operation");
          }
-        try {
+       
         await this.axiosInstance.put<void, any>(`/authors/${authorId}/followers/${foreignAuthorId}`, {
             status:'friends'
         });
         
-        let actor = await this.getAuthor(foreignAuthorId);
-        let object = await this.getAuthor(authorId);
 
-    } catch (e) {
-            
-        }
         
     }
 
@@ -173,13 +168,9 @@ class API {
         if (this.nodeType === "remote") {
             throw new Error("Remote nodes do not support this operation");
         }
-            try {
-               
+             
         return await this.axiosInstance.delete<void, any>(`/authors/${authorId}/followers/${foreignAuthorId}`);
-        } 
-        catch (e) {
-            console.log(e);
-        }
+        
         
     }
 
@@ -350,7 +341,7 @@ class API {
     }
 
     public async createLike(authorId:string, post:Post, authorFrom:Author):Promise<void> {
-        try {
+        
             await this.sendToInbox(authorId, {
                     "@context": "https://www.w3.org/ns/activitystreams",
                     "summary": `${authorFrom.displayName} liked your post: ${post.title}`,
@@ -359,13 +350,11 @@ class API {
                     object: post.id,
                 }
             );
-        } catch (e) {
-            console.log(e);
-        } 
+         
     }
 
     public async createCommentLike(authorId:string, comment:Comment, authorFrom:Author):Promise<void> {
-        try {
+        
             await this.sendToInbox(authorId, {
                         "@context": "https://www.w3.org/ns/activitystreams",
                         "summary": `${authorFrom.displayName} liked your comment`,
@@ -374,9 +363,7 @@ class API {
                         object: comment?.id || '',
                     }
                 );
-        } catch (e) {
-            console.log(e);
-        }
+        
     }
 
     public async getLiked(authorId:string):Promise<ListItem<Like>> {

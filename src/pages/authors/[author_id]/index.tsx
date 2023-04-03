@@ -30,7 +30,7 @@ const Page: NextPage<Props> = ({authorId, userId, userAuthor}) => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [followStatusState, setFollowStatusState] = useState<string | undefined>(undefined)
 	const queryClient = useQueryClient();
-  	const user = useUser()
+  	const user = useUser();
 	const alert = useAlert();
 
 	const {
@@ -51,7 +51,6 @@ const Page: NextPage<Props> = ({authorId, userId, userAuthor}) => {
 	} = useQuery({ queryKey: ['followStatus', authorId], queryFn: async () => await NodeClient.checkFollowerStatus(authorId, userId), 
 	enabled: userId !== authorId,
 	onSuccess: (data) => {
-	
 		setFollowStatusState(data)
 	},
 	

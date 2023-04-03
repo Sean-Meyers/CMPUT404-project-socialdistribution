@@ -55,8 +55,12 @@ class API17 extends APIBase {
     }
 
     public override async sendFollowRequest(authorTo: Author, authorFrom: Author): Promise<void> {
-        try {
+        
             if (authorTo.id) {
+                if (authorFrom.created_at) {
+                    delete authorFrom.created_at;
+                }
+
                 let authorId = authorTo.id;                await this.sendToInbox(authorId || '', {
                         type: 'follow',
                         summary: `${authorFrom?.displayName || 'Someone'} wants to follow you`,
@@ -64,9 +68,8 @@ class API17 extends APIBase {
                         object: authorTo
                 });
             }
-        } catch (e) {
-            console.log(e);
-        }
+     
+       
     }
 
 }

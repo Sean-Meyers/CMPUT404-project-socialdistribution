@@ -1,6 +1,6 @@
 import APIBase from '../../api'
 import { AxiosRequestConfig } from 'axios';
-import { Author, CommentListItem, ListItem, Post, Comment } from '@/index';
+import { Author, CommentListItem, ListItem, Post, Comment, Activity, T12PostFormat } from '@/index';
 import { ServiceService as AuthorService, OpenAPI } from './gen';
 
 OpenAPI.BASE = process.env.NEXT_PUBLIC_T12_API_URL || 'https://cmput404-project-data.herokuapp.com';
@@ -16,25 +16,59 @@ class API12 extends APIBase {
         let id = authorTo.id ||'a';
         try {
             await AuthorService.serviceAuthorsInboxCreate(id, {
-            followRequest:{
-                type: "follow",
-                summary: `${authorFrom.displayName || "Someone"} wants to follow you`,
-                author: {
-                    id: authorFrom.id || '',
-                    url: authorFrom.url || '',
-                    host: authorFrom.host || '',
-                    displayName: authorFrom.displayName || '',
-                    github: authorFrom.github || '',
-                    profileImage: authorFrom.profileImage || ''
+                followRequest:{
+                    type: "follow",
+                    summary: `${authorFrom.displayName || "Someone"} wants to follow you`,
+                    author: {
+                        id: authorFrom.id || '',
+                        url: authorFrom.url || '',
+                        host: authorFrom.host || '',
+                        displayName: authorFrom.displayName || '',
+                        github: authorFrom.github || '',
+                        profileImage: authorFrom.profileImage || ''
+                    }
                 }
-            }
-        })
+            })
         } catch (e) {
             console.error(e)
-         
         }
-        
     }
+
+    private postAdapter(post:Post): T12PostFormat {
+        delete post.author?.created_at;
+        return {
+            type: "post",
+            post: {
+                id: post.id || "",
+                title: post.title || "",
+                source: post.source || "",
+                origin: post.origin || "",
+                description: post.description || "",
+                contentType: post.contentType || "",
+                content: post.content || "",
+                visibility: post.visibility || "PUBLIC",
+                unlisted: post.unlisted || false,
+                author: post.author,
+                comments: post.comments || "",
+                published: post.published || "",
+            }, 
+            sender: post.author,
+        
+        }  
+    }
+
+    public override async sendToInbox(authorId:string, activity:Activity):Promise<void> {
+        if (activity.type === "post") {
+            let post = activity as Post;
+            let id = authorId || 'a';
+            try {
+                await this.axiosInstance.post(`/service/authors/${authorId}/inbox/`, this.postAdapter(post));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }
+
 
     public override async getAuthors(page?: number, size?: number, query?: string): Promise<ListItem<Author>> {
        try {

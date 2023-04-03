@@ -1,6 +1,7 @@
 import API from "./api";
-import {Author, CommentListItem, ListItem, Post, Comment, Like, InboxListItem, Activity} from "../index";
+import {Author, CommentListItem, ListItem, Post, Comment, Like, InboxListItem, Activity, Follow} from "../index";
 import { getURL } from ".";
+
 
 const memo = (callback:any) => {
   const cache = new Map();
@@ -379,7 +380,38 @@ class NodeManager  {
     public async getInbox(authorId: string): Promise<InboxListItem> {
         for (const node of Object.values(this.nodes)) {
             if (node.getNodeType() === "local") {
-                return await node.getInbox(authorId);
+                let inbox = await node.getInbox(authorId);
+                // iterate through inbox items 
+                let inboxItems = inbox.items;
+                let inboxItemsNew: (Like | Comment | Follow | Post | undefined)[] = [];
+                if (inboxItems) {
+                    let inboxPosts = inboxItems.map(async (item) => {
+                        if (item.type === 'post') {
+                            let id = item.id?.split('/').pop() || '';
+                            let post = await this.getPost(authorId, id);
+                            if (post) {
+                                return post;
+                            }
+                        }
+                    });
+                    let allInboxPosts = await Promise.all(inboxPosts);
+                
+                    // iterate through inbox items
+                    for (let i = 0; i < inboxItems.length; i++) {
+                        if (inboxItems[i].type === 'post') {
+                            inboxItemsNew.push(allInboxPosts[i]);
+                        } else {
+                            inboxItemsNew.push(inboxItems[i]);
+                        }
+                    }
+                    // remove undefined items
+                    inboxItemsNew = inboxItemsNew.filter((item) => item !== undefined);
+                    inbox.items = inboxItemsNew as (Like | Comment | Follow | Post)[];
+                    return inbox;
+                }
+
+                
+                
             }
         }
         throw new Error("No local node found");

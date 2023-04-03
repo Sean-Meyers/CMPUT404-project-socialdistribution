@@ -16,7 +16,7 @@ import {NodeManager, NodeClient} from '@/nodes';
 import { getBase64 } from '@/utils';
 import { useRouter } from 'next/router';
 import { useMutation } from '@tanstack/react-query';
-
+import { useAlert } from 'react-alert';
 interface createProps {
 	type: string;
 	id: string;
@@ -31,6 +31,7 @@ const Create: React.FC<createProps> = ({displayName, github, profileImage}) => {
 	const supabaseClient = useSupabaseClient()
   	const user = useUser()
 	const router = useRouter()
+	const alert = useAlert()
 	const editProfileMutation = useMutation(async (data:any) => {
 		if (data.profile && data.profile.length > 0) {
 			data.profileImage = await getBase64(data.profile[0])
@@ -44,6 +45,10 @@ const Create: React.FC<createProps> = ({displayName, github, profileImage}) => {
         } catch (error) {
             console.log(error)
         }
+	}, {
+		onSuccess: () => {
+			alert.success('Profile updated!');
+		}
 	})
 	const { register, handleSubmit, watch, formState: { errors } } = useForm({
 		defaultValues: {
