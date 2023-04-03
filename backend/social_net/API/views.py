@@ -389,7 +389,44 @@ def PostsRetrieveView(request, author_id, post_id):
 # TODO: IMAGE POST ENDPOINT: URL: ://service/authors/{AUTHOR_ID}/posts/{POST_ID}/image
 # https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/project.org#image-posts
 
-
+@swagger_auto_schema(methods=['GET', 'POST'], 
+    manual_parameters=[
+        openapi.Parameter('page', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Page number'),
+        openapi.Parameter('size', openapi.IN_QUERY, type=openapi.TYPE_INTEGER, description='Number of comments per page')
+    ], 
+    responses={
+        200: openapi.Response('Success', schema=openapi.Schema(
+            type='object',
+            properties={
+                'type': openapi.Schema(type='string', example='comments'),
+                'page': openapi.Schema(type='integer', example=1),
+                'size': openapi.Schema(type='integer', example=5),
+                'post': openapi.Schema(type='string', example='12345678'),
+                'id': openapi.Schema(type='string', example='12345678'),
+                'comments': openapi.Schema(
+                    type='array',
+                    items=openapi.Schema(
+                        type='object',
+                        properties={
+                            'type': openapi.Schema(type='string', example='comment'),
+                            'author': openapi.Schema(type='object', properties={
+                                'type': openapi.Schema(type='string', example='author'),
+                                'id': openapi.Schema(type='string', example='http://127.0.0.1:8000/author/12345678'),
+                                'host': openapi.Schema(type='string', example='http://127.0.0.1:8000/'),
+                                'displayName': openapi.Schema(type='string', example='John Smith'),
+                                'url': openapi.Schema(type='string', example='http://127.0.0.1:8000/author/12345678')
+                            }),
+                            'comment': openapi.Schema(type='string', example='This is a comment.'),
+                            'contentType': openapi.Schema(type='string', example='text/plain'),
+                            'published': openapi.Schema(type='string', example='2023-04-03T04:05:06Z'),
+                            'id': openapi.Schema(type='string', example='12345678'),
+                        }
+                    )
+                )
+            }
+        ))
+    }
+)
 @api_view(['GET', 'POST'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 def CommentsView(request, author_id, post_id):
