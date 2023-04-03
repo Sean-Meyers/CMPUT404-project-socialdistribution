@@ -1,0 +1,8 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/Sean-Meyers/CMPUT404-project-socialdistribution.git
+	branch = backend-heroku-hell
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/tkuye/CMPUT404-project-socialdistribution.git
+	branch = frontend-deployment

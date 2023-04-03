@@ -1,0 +1,14 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/authors/[author_id]/posts/[post_id]": "pages/authors/[author_id]/posts/[post_id].js",
+  "/authors/[author_id]": "pages/authors/[author_id].js",
+  "/api/authors/[author_id]/followers/[foreign_author_id]": "pages/api/authors/[author_id]/followers/[foreign_author_id].js",
+  "/api/authors/[author_id]/followers": "pages/api/authors/[author_id]/followers.js",
+  "/api/authors/[author_id]": "pages/api/authors/[author_id].js",
+  "/api/authors/[author_id]/posts": "pages/api/authors/[author_id]/posts.js",
+  "/": "pages/index.js",
+  "/api/authors/[author_id]/inbox": "pages/api/authors/[author_id]/inbox.js",
+  "/api/authors/[author_id]/liked": "pages/api/authors/[author_id]/liked.js"
+}
