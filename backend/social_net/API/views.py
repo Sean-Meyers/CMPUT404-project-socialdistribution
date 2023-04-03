@@ -578,6 +578,16 @@ def InboxView(request, author_id):
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
+@swagger_auto_schema(
+method='get',
+operation_summary='API endpoint that allows users to like a post',
+responses={
+200: 'OK - Successful operation. Returns a JSON object containing the likes for the post.',
+401: 'Unauthorized - Authentication failed or user does not have permission to perform the operation.',
+404: 'Not Found - The requested resource was not found.',
+500: 'Internal Server Error - The server encountered an unexpected condition that prevented it from fulfilling the request.'
+}
+)
 def PostLikeView(request, author_id, post_id):
     """
     API endpoint that allows users to like a post.
