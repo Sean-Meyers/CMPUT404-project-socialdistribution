@@ -575,19 +575,29 @@ def InboxView(request, author_id):
     LikeModel.objects.create(**output)
     return JsonResponse({"status":"success"}, status = 200)
 
-
+@swagger_auto_schema(
+    method='get',
+    operation_description='API endpoint that allows users to like a post.',
+    responses={
+        200: openapi.Response(
+            'Successful operation',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'object': openapi.Schema(type=openapi.TYPE_STRING, description='Post URL'),
+                    'likes': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT), description='List of post likes'),
+                },
+            ),
+        ),
+    },
+    manual_parameters=[
+        openapi.Parameter('author_id', openapi.IN_PATH, description='Author ID', type=openapi.TYPE_STRING),
+        openapi.Parameter('post_id', openapi.IN_PATH, description='Post ID', type=openapi.TYPE_STRING),
+    ],
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
-@swagger_auto_schema(
-method='get',
-operation_summary='API endpoint that allows users to like a post',
-responses={
-200: 'OK - Successful operation. Returns a JSON object containing the likes for the post.',
-401: 'Unauthorized - Authentication failed or user does not have permission to perform the operation.',
-404: 'Not Found - The requested resource was not found.',
-500: 'Internal Server Error - The server encountered an unexpected condition that prevented it from fulfilling the request.'
-}
-)
+
 def PostLikeView(request, author_id, post_id):
     """
     API endpoint that allows users to like a post.
@@ -601,7 +611,26 @@ def PostLikeView(request, author_id, post_id):
     output = {"object": object, "likes": post_likes_paginated}
     return JsonResponse(output, status = 200)
 
-
+@swagger_auto_schema(
+    method='get',
+    operation_description='API endpoint that allows users to view liked posts.',
+    responses={
+        200: openapi.Response(
+            'Successful operation',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'object': openapi.Schema(type=openapi.TYPE_STRING, description='Post URL'),
+                    'likes': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT), description='List of liked posts'),
+                },
+            ),
+        ),
+    },
+    manual_parameters=[
+        openapi.Parameter('author_id', openapi.IN_PATH, description='Author ID', type=openapi.TYPE_STRING),
+        openapi.Parameter('post_id', openapi.IN_PATH, description='Post ID', type=openapi.TYPE_STRING),
+    ],
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 def PostLikeView(request, author_id, post_id):
