@@ -163,7 +163,25 @@ def AuthorFollowersView(request, uid):
     # output = serialized_object.data
     return JsonResponse({uid:author_object}, status = 200)
 
-
+@swagger_auto_schema(
+    methods=['get'],
+    operation_summary="Check if an author is a follower of another author",
+    operation_description="Check if FOREIGN_AUTHOR_ID is a follower of AUTHOR_ID",
+    manual_parameters=[
+        openapi.Parameter('uid', openapi.IN_PATH, description="Author ID", type=openapi.TYPE_STRING),
+        openapi.Parameter('foreign_uid', openapi.IN_PATH, description="Foreign Author ID", type=openapi.TYPE_STRING)
+    ],
+    responses={
+        200: openapi.Response('Successful response', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'status': openapi.Schema(type=openapi.TYPE_STRING, example='success')
+            }
+        )),
+        404: "Author not found",
+        500: "Internal server error"
+    }
+)
 @api_view(['DELETE', 'PUT', 'GET'])
 @permission_classes([IsAdminUser|IsAuthenticated&PermittedForRemote])
 def AuthorFollowersOperationsView(request, uid, foreign_uid):
