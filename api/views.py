@@ -470,63 +470,63 @@ class PostsView(generics.ListCreateAPIView):
 
 
 # This is dumb, just do resharing and DMs from the frontend with inbox endpoint. Gonna keep commented out temporarily in case I change my mind.
-# class ShareView(generics.CreateAPIView):
-#     """
-#     Enables an author to share any author's post with any author.
+class ShareView(generics.CreateAPIView):
+    """
+    Enables an author to share any author's post with any author.
     
-#     Even if the post is unlisted, the author can share it with anyone, even if
-#     they are not friends, and not on the same server.
+    Even if the post is unlisted, the author can share it with anyone, even if
+    they are not friends, and not on the same server.
     
-#     URL:
-#     authors/<str:author_id>/share/<str:encoded_post_url>/<str:encoded_destination_author_url>
+    URL:
+    authors/<str:author_id>/share/<str:encoded_post_url>/<str:encoded_destination_author_url>
 
-#     Mechanics:
-#     Retrieve the post from the original author's server by making a GET request
-#     to <encoded_post_url>. Next, PUT to PostView the json data in the response,
-#     but set the id to be service/authors/<str:author_id>/posts/<str:encoded_post_url>.  # Might be less hacky to just generate a new id instead.
-#     The source field should be <str:encoded_post_url>, the origin field should
-#     remain as it is. Next, take this newly created post's json, change the
-#     source field to the id of the newly created post, and send it to the inbox
-#     of <str:encoded_destination_author_url>.
+    Mechanics:
+    Retrieve the post from the original author's server by making a GET request
+    to <encoded_post_url>. Next, PUT to PostView the json data in the response,
+    but set the id to be service/authors/<str:author_id>/posts/<str:encoded_post_url>.  # Might be less hacky to just generate a new id instead.
+    The source field should be <str:encoded_post_url>, the origin field should
+    remain as it is. Next, take this newly created post's json, change the
+    source field to the id of the newly created post, and send it to the inbox
+    of <str:encoded_destination_author_url>.
     
-#     Can also be used for DMs if rather than sharing an existing post we create a
-#     brand new one. Would be a different method of course, or even endpoint for
-#     that matter.
+    Can also be used for DMs if rather than sharing an existing post we create a
+    brand new one. Would be a different method of course, or even endpoint for
+    that matter.
     
-#     XXX: There must be a better way to do this but ¯\_(ツ)_/¯
+    XXX: There must be a better way to do this but ¯\_(ツ)_/¯
 
-#     Return a JsonResponse with new copy of the shared post. I guess.
-#     """
-#     authentication_classes = [SessionAuthentication, BasicAuthentication]
-#     permission_classes = [IsAdminUser]
-#     queryset = PostsModel.objects.all()
-#     serializer_class = PostsSerializer
+    Return a JsonResponse with new copy of the shared post. I guess.
+    """
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAdminUser]
+    queryset = PostsModel.objects.all()
+    serializer_class = PostsSerializer
     
-#     @staticmethod
-#     def _get_auth(url_to_authorize):
-#         if url_to_authorize.startswith('http://sd7') or url_to_authorize.startswith('https://sd7'):
-#             return (os.getenv('T7_UNAME'), os.getenv('T7_PW'))
-#         elif url_to_authorize.startswith('http://sd16') or url_to_authorize.startswith('https://sd16'):
-#             return (os.getenv('ADMIN_UNAME'), os.getenv('ADMIN_PW'))
-#         elif url_to_authorize.startswith('http://social-distribution-w23-t17') or url_to_authorize.startswith('https://social-distribution-w23-t17'):
-#             return (os.getenv('T17_UNAME'), os.getenv('T17_PW'))
-#         elif url_to_authorize.startswith('http://cmput404-project-data') or url_to_authorize.startswith('https://cmput404-project-data'):
-#             return (os.getenv('T12_UNAME'), os.getenv('T12_PW'))
-#         else:
-#             return ('','')
+    @staticmethod
+    def _get_auth(url_to_authorize):
+        if url_to_authorize.startswith('http://sd7') or url_to_authorize.startswith('https://sd7'):
+            return (os.getenv('T7_UNAME'), os.getenv('T7_PW'))
+        elif url_to_authorize.startswith('http://sd16') or url_to_authorize.startswith('https://sd16'):
+            return (os.getenv('ADMIN_UNAME'), os.getenv('ADMIN_PW'))
+        elif url_to_authorize.startswith('http://social-distribution-w23-t17') or url_to_authorize.startswith('https://social-distribution-w23-t17'):
+            return (os.getenv('T17_UNAME'), os.getenv('T17_PW'))
+        elif url_to_authorize.startswith('http://cmput404-project-data') or url_to_authorize.startswith('https://cmput404-project-data'):
+            return (os.getenv('T12_UNAME'), os.getenv('T12_PW'))
+        else:
+            return ('','')
     
-#     def post(self, request, *args, **kwargs):
-#         # get from the encoded_post_url in the url
-#         encoded_post_url = kwargs['encoded_post_url']
-#         author_id = kwargs['author_id']
-#         auth = ShareView._get_auth(encoded_post_url)
-#         post_to_share_resp = requests.get(encoded_post_url, auth=auth, timeout=5)
-#         if post_to_share_resp.status_code != 200:
-#             return Response({'detail': 'Post not found.'}, status=404)
-#         post_to_share = post_to_share_resp.json()
-#         # todo modifiy it first
-#         post_to_share['source'] = encoded_post_url
-#         requests.put(build_post_url(author_id=author_id, post_id=encoded_post_url), json=post_to_share, auth=auth, timeout=5)
+    def post(self, request, *args, **kwargs):
+        # get from the encoded_post_url in the url
+        encoded_post_url = kwargs['encoded_post_url']
+        author_id = kwargs['author_id']
+        auth = ShareView._get_auth(encoded_post_url)
+        post_to_share_resp = requests.get(encoded_post_url, auth=auth, timeout=5)
+        if post_to_share_resp.status_code != 200:
+            return Response({'detail': 'Post not found.'}, status=404)
+        post_to_share = post_to_share_resp.json()
+        # todo modifiy it first
+        post_to_share['source'] = encoded_post_url
+        requests.put(build_post_url(author_id=author_id, post_id=encoded_post_url), json=post_to_share, auth=auth, timeout=5)
         
 
 
