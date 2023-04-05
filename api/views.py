@@ -469,7 +469,6 @@ class PostsView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=400)
 
 
-# This is dumb, just do resharing and DMs from the frontend with inbox endpoint. Gonna keep commented out temporarily in case I change my mind.
 class ShareView(generics.CreateAPIView):
     """
     Enables an author to share any author's post with any author.
@@ -503,17 +502,19 @@ class ShareView(generics.CreateAPIView):
     serializer_class = PostsSerializer
     
     @staticmethod
-    def _get_auth(url_to_authorize):
-        if url_to_authorize.startswith('http://sd7') or url_to_authorize.startswith('https://sd7'):
-            return (os.getenv('T7_UNAME'), os.getenv('T7_PW'))
-        elif url_to_authorize.startswith('http://sd16') or url_to_authorize.startswith('https://sd16'):
-            return (os.getenv('ADMIN_UNAME'), os.getenv('ADMIN_PW'))
-        elif url_to_authorize.startswith('http://social-distribution-w23-t17') or url_to_authorize.startswith('https://social-distribution-w23-t17'):
-            return (os.getenv('T17_UNAME'), os.getenv('T17_PW'))
-        elif url_to_authorize.startswith('http://cmput404-project-data') or url_to_authorize.startswith('https://cmput404-project-data'):
-            return (os.getenv('T12_UNAME'), os.getenv('T12_PW'))
-        else:
-            return ('','')
+    def _get_auth(url_to_auth_cred):
+        auth_form = {
+            'sd7' : 'T7',
+            'sd16' : 'ADMIN',
+            'social-distribution-w23-t17' : 'T17',
+            'cmput404-project-data' : 'T12'
+        }
+        for site, credential in auth_mappings.items():
+            if url_to_authorize.startswith(f'http://{site}') or url_to_authorize.startswith(f'https://{site}'):
+                return (os.getenv(credential + "_UNAME"), os.getenv(credential + "_PW"))
+
+    return ('', '')
+    
     
     def post(self, request, *args, **kwargs):
         # get from the encoded_post_url in the url
