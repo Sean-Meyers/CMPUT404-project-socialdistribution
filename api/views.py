@@ -501,6 +501,7 @@ class ShareView(generics.CreateAPIView):
     queryset = PostsModel.objects.all()
     serializer_class = PostsSerializer
     
+    #minor edits
     @staticmethod
     def _get_auth(url_to_auth_cred):
         auth_form = {
@@ -515,8 +516,7 @@ class ShareView(generics.CreateAPIView):
 
     return ('', '')
     
-    
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         # get from the encoded_post_url in the url
         encoded_post_url = kwargs['encoded_post_url']
         author_id = kwargs['author_id']
@@ -524,7 +524,11 @@ class ShareView(generics.CreateAPIView):
         post_to_share_resp = requests.get(encoded_post_url, auth=auth, timeout=5)
         if post_to_share_resp.status_code != 200:
             return Response({'detail': 'Post not found.'}, status=404)
-        post_to_share = post_to_share_resp.json()
+        else:
+            return post_to_share_resp.json()
+    
+    def post(self, request):
+        post_to_share = self.ShareView.get(encoded_post_url)
         # todo modifiy it first
         post_to_share['source'] = encoded_post_url
         requests.put(build_post_url(author_id=author_id, post_id=encoded_post_url), json=post_to_share, auth=auth, timeout=5)
