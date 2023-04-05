@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('authors/', views.AuthorsView.as_view(), name='Index'),
     path('authors/<str:author_id>', views.AuthorView.as_view(), name='Author'),
+    path('authors/<str:author_id>', views.GithubView.as_view(), name='Github'),
     path('authors/<str:author_id>/image', views.ImageView.as_view(), name='Author Image'),
     path('authors/<str:author_id>/followers', views.FollowersView.as_view(), name='Followers'),
     path('authors/<str:author_id>/followers/<str:foreign_author_id>', views.FollowView.as_view(), name='Follow'),
