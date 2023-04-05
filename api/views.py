@@ -206,16 +206,31 @@ class FollowersView(generics.ListAPIView):
 class GithubView(generics.ListAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAdminUser|IsAuthenticated&PermittedForRemote]
-    queryset = FollowModel.objects.all()
-    serializer_class = FollowSerializer
+    queryset = AuthorModel.objects.all()
+    serializer_class = AuthorSerializer
     
-    def fetch_github_activity(user):
-        url = f"https://api.github.com/users/{user}/events/public"
+    def get_public_github_stream(github_uid):
+        url = f"https://api.github.com/users/{github_uid}/events/public"
 
         response = requests.get(url, headers={'Accept': 'application/vnd.github+json'})
 
         if response.status_code == 200:
             return response.json()
+   
+    def get(self, request, *args, **kwargs):
+        # find public github stream given an user_id
+        author_id = kwargs['author_id']
+        author_id = build_author_url(author_id)
+
+        
+        author = AuthorSerializer(AuthorModel.objects.filter(id=author_id).first()).data
+        github = author.json()['github']
+        
+        github_stream = GithubView.get_public_github_stream(github)
+        return Response({
+            "author_id": author_id,
+            "github_stream": github_stream,
+        })
         
 
 class FollowView(generics.RetrieveUpdateDestroyAPIView):
