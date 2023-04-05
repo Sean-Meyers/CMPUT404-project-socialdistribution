@@ -202,6 +202,20 @@ class FollowersView(generics.ListAPIView):
             "type": "followers",
             "items": followers_list,
         })
+    
+class GithubView(generics.ListAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAdminUser|IsAuthenticated&PermittedForRemote]
+    queryset = FollowModel.objects.all()
+    serializer_class = FollowSerializer
+    
+    def fetch_github_activity(user):
+        url = f"https://api.github.com/users/{user}/events/public"
+
+        response = requests.get(url, headers={'Accept': 'application/vnd.github+json'})
+
+        if response.status_code == 200:
+            return response.json()
         
 
 class FollowView(generics.RetrieveUpdateDestroyAPIView):
