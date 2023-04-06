@@ -462,5 +462,17 @@ class AuthorViewAuthenticationTest(APITestCase):
         response = self.client.post(grab_info_for_the_post, data=updated_author)
         self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+class FollowersViewAuthenticationTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='user', password='123', email='user@example.com')
+        self.author1 = AuthorModel.objects.create()
+        self.author2 = AuthorModel.objects.create()
+        self.author3 = AuthorModel.objects.create()
+        self.follow1 = FollowModel.objects.create(follower=self.author1.id, following=self.author2.id, status='friends')
+        self.follow2 = FollowModel.objects.create(follower=self.author1.id, following=self.author3.id, status='pending')
+        self.follow3 = FollowModel.objects.create(follower=self.author3.id, following=self.author1.id, status='friends')
+        self.follow_url = reverse('followers-list', kwargs={'author_id': self.author1.id})
+
 
 
