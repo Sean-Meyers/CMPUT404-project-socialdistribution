@@ -433,5 +433,16 @@ class AuthorViewAuthenticationTest(APITestCase):
         self.client.login(username='user', password='123')
         response = self.client.put(grab_updated_info, data=updated_author)
         self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+   
+    def test_authentication_delete(self):
+        grab_delete = reverse('author-detail', kwargs={'author_id': self.author_id})
+        # Test unauthenticated request
+        
+        response = self.client.delete(grab_delete)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # Test authenticated request
+        self.client.login(username='user', password='123')
+        response = self.client.delete(grab_delete)
+        self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
