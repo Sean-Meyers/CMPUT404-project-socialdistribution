@@ -395,3 +395,16 @@ class LikeViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['summary'], 'new_test_like')
+ 
+class AuthorViewAuthenticationTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='user', password='123', email='user@example.com')
+        self.admin_user = User.objects.create_superuser(username='admin', password='123', email='admin@example.com')
+
+        self.author = AuthorModel.objects.create(
+            displayName="auth_test",
+            github="https://github.com/auth_test",
+            profileImage="image"
+        )
+        self.author_id = self.author.id
