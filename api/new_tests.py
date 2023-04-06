@@ -472,7 +472,17 @@ class FollowersViewAuthenticationTest(TestCase):
         self.follow1 = FollowModel.objects.create(follower=self.author1.id, following=self.author2.id, status='friends')
         self.follow2 = FollowModel.objects.create(follower=self.author1.id, following=self.author3.id, status='pending')
         self.follow3 = FollowModel.objects.create(follower=self.author3.id, following=self.author1.id, status='friends')
-        self.follow_url = reverse('followers-list', kwargs={'author_id': self.author1.id})
+        
+    def test_authentication_get_followers(self):
+        grab_url = reverse('followers-list', kwargs={'author_id': self.author1.id})
+        # unauthenticated get followers request
+        response = self.client.get(self.grab_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # authenticated get followers request
+        self.client.login(username='user', password='123')
+        response = self.client.get(self.grab_url)
+        self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 
