@@ -425,13 +425,13 @@ class AuthorViewAuthenticationTest(APITestCase):
             'github': 'https://github.com/auth_test_updated',
             'profileImage': 'updated_image'
         }
-        grab_updated_info = reverse('author-detail', kwargs={'author_id': self.author_id}), data=updated_author)
+        grab_updated_info = reverse('author-detail', kwargs={'author_id': self.author_id})
         # unauthenticated put request
-        response = self.client.put(grab_updated_info)
+        response = self.client.put(grab_updated_info, data=updated_author)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         # authenticated put request
         self.client.login(username='user', password='123')
-        response = self.client.put(grab_updated_info)
+        response = self.client.put(grab_updated_info, data=updated_author)
         self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
