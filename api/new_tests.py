@@ -444,5 +444,23 @@ class AuthorViewAuthenticationTest(APITestCase):
         self.client.login(username='user', password='123')
         response = self.client.delete(grab_delete)
         self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        
+    def test_authentication_post(self):
+        
+        grab_info_for_the_post = reverse('author-list')
+        updated_author = {
+            'displayName': 'auth_test_updated',
+            'github': 'https://github.com/auth_test_updated',
+            'profileImage': 'updated_image'
+        }
+        # unauthenticated post request
+        response = self.client.post(grab_info_for_the_post, data=updated_author)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # authenticated post request
+        self.client.login(username='user', password='123')
+        response = self.client.post(grab_info_for_the_post, data=updated_author)
+        self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 
