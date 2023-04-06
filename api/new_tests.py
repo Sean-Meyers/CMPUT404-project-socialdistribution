@@ -407,4 +407,15 @@ class AuthorViewAuthenticationTest(APITestCase):
             github="https://github.com/auth_test",
             profileImage="image"
         )
-        self.author_id = self.author.id
+        
+   def test_authentication_get(self):
+        grab_info = reverse('author-detail', kwargs={'author_id': self.self.author.id})
+        # unauthenticated request
+        response = self.client.get(grab_info)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # authenticated request
+        self.client.login(username='user', password='123')
+        response = self.client.get(grab_info)
+        self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
