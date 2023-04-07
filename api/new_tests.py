@@ -532,4 +532,18 @@ class CommentsViewAuthenticationTest(APITestCase):
         response = self.client.post(grab_info_for_the_comment, self.data, format='json')
         self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED) 
 
+class SQLInjectionTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='user', password='123', email='user@example.com')
+
+    def test_sql_injection_login(self):
+        malicious_input = "user@example.com' OR '1'='1"
+        self.client.login(username=malicious_input, password='123')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['email'], 'user@example.com')
+   
+    
+        
 
