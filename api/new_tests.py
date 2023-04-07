@@ -536,6 +536,15 @@ class SQLInjectionTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='user', password='123', email='user@example.com')
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='user', password='123', email='user@example.com')
+        self.admin_user = User.objects.create_superuser(username='admin', password='123', email='admin@example.com')
+
+        self.author = AuthorModel.objects.create(
+            displayName="auth_test",
+            github="https://github.com/auth_test",
+            profileImage="image"
+        )
 
     def test_sql_injection_login(self):
         malicious_input = "user@example.com' OR '1'='1"
@@ -544,6 +553,12 @@ class SQLInjectionTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['email'], 'user@example.com')
    
-    
+    def test_sql_injection_drop_table(self):
+        malicious_input = "INSERT INTO Students VALUES ( '$Name' )"
         
-
+        self.client.login(username=malicious_input, password='123')
+        
+        grab_info = reverse('author-detail', kwargs={'author_id': malicious_input})
+        
+        response = self.client.get(grab_info)
+        self.assertNotEqual(response.status_code, 200)
