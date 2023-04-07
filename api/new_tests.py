@@ -562,3 +562,13 @@ class SQLInjectionTest(TestCase):
         
         response = self.client.get(grab_info)
         self.assertNotEqual(response.status_code, 200)
+        
+   def test_sql_injection_drop_table_followers(self):
+        malicious_input = "INSERT INTO Students VALUES ( '$Name' )"
+        
+        self.client.login(username=malicious_input, password='123')
+        grab_url = reverse('followers-list', kwargs={'author_id': malicious_input})
+#         grab_info = reverse('author-detail', kwargs={'author_id': malicious_input})
+        
+        response = self.client.get(grab_info)
+        self.assertNotEqual(response.status_code, 200)
