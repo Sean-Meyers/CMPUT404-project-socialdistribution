@@ -484,5 +484,27 @@ class FollowersViewAuthenticationTest(TestCase):
         response = self.client.get(self.grab_url)
         self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+class CommentsViewAuthenticationTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='user', password='123', email='user@example.com')
+
+        self.author = AuthorModel.objects.create(
+            id='http://localhost:8080/author/1',
+            displayName='i_am_an_author'
+        )
+        self.post = PostsModel.objects.create(
+            id='http://localhost:8080/author/1/posts/1',
+            title='this is a post',
+            author=self.author
+        )
+        self.comment = CommentsModel.objects.create(
+            author=self.author,
+            comment='hello',
+            host='http://localhost:8080',
+            contentType='text/plain',
+            post=self.post
+        )
+        
 
 
