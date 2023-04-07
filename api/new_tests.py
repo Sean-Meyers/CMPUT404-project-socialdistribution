@@ -505,6 +505,17 @@ class CommentsViewAuthenticationTest(APITestCase):
             contentType='text/plain',
             post=self.post
         )
+   def test_authentication_get_comments(self):
+        grab_info_for_the_comment = reverse('comments_view', kwargs={'author_id': '1', 'post_id': '1'})
+        # unauthenticated get request
+        response = self.client.get(grab_info_for_the_comment)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # authenticated get request
+        self.client.login(username='user', password='123')
+        response = self.client.get(grab_info_for_the_comment)
+        self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
         
 
 
