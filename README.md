@@ -10,12 +10,16 @@ Make a distributed social network!
 Contributing
 ============
 
-Send a pull request and be sure to update this file with your name.
+
+
+
+
+
 
 Contributors / Licensing
 ========================
 
-Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle, Sean Meyers, Cenab Bora, Tosine Kuye, Sukanta Saha Qiaoxi Guo.
+Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle, Sean Meyers @Sean-Meyers, Cenab Bora @cenab, Tosine Kuye @tkunye, Sukanta Saha, @sahasukanta Qiaoxi Guo @breadtitor. @2023
 
 All text is licensed under the CC-BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/deed.en_US
 
