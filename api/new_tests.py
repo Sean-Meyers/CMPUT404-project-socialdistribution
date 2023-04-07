@@ -505,6 +505,14 @@ class CommentsViewAuthenticationTest(APITestCase):
             contentType='text/plain',
             post=self.post
         )
+        
+        self.data = {
+            'author': AuthorSerializer(self.author).data,
+            'comment': 'test',
+            'host': 'http://localhost:8080',
+            'contentType': 'text/plain',
+        }
+        
    def test_authentication_get_comments(self):
         grab_info_for_the_comment = reverse('comments_view', kwargs={'author_id': '1', 'post_id': '1'})
         # unauthenticated get request
@@ -516,6 +524,12 @@ class CommentsViewAuthenticationTest(APITestCase):
         response = self.client.get(grab_info_for_the_comment)
         self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        
+   def test_authentication_post_comment(self):
+        response = self.client.post(grab_info_for_the_comment, self.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.client.login(username='user', password='123')
+        response = self.client.post(grab_info_for_the_comment, self.data, format='json')
+        self.assertNotEqual(response.status_code, status.HTTP_401_UNAUTHORIZED) 
 
 
